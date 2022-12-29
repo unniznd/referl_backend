@@ -1,5 +1,8 @@
+
+from dotenv import load_dotenv
 import os
-    
+
+load_dotenv()
 
 
 from pathlib import Path
@@ -22,18 +25,18 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'your-db-name',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb+srv://<username>:<password>@<atlas cluster>/<myFirstDatabase>?retryWrites=true&w=majority'
-        }  
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'referldb',
+        'USER': 'unnikuznd',
+        'PASSWORD': os.getenv("PASSWORD"),
+        'HOST':'unnikuznd.mysql.pythonanywhere-services.com',
+        'PORT':'3306',
     }
 }
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': "dhw9oa5fm",
-    'API_KEY': os.environ.get("API_KEY"),
-    'API_SECRET': os.environ.get("API_SECRET"),
+    'API_KEY': os.getenv("API_KEY"),
+    'API_SECRET': os.getenv("API_SECRET"),
 }
 
