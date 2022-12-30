@@ -1,6 +1,9 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import permissions
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework import status
 
 from users.models import ShopOwner, Influencer
 from users.pagination import ShopOwnerPagination
@@ -69,6 +72,39 @@ class ShopOwnerPublicView(ListAPIView):
         return self.get_paginated_response(shop_owners_serial.data)
 
 
-class GetToken(ListAPIView):
+class CustomAuthToken(ObtainAuthToken):
+
     def post(self, request, *args, **kwargs):
-        pass
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        if request.data["is_shopowner"] == True:
+            shopowner = ShopOwner.objects.filter(profile=user).first()
+            if shopowner:
+                return Response({
+                    'token': token.key,
+                    'user_id': user.pk,
+                    'email': user.email
+                })
+            else:
+                return Response({"error":"Invalid Credentials"},status=status.HTTP_400_BAD_REQUEST)
+        
+        elif request.data["is_shopowner"] == False:
+            influencer = Influencer.objects.filter(profile=user).first()
+            if influencer:
+                return Response({
+                    'token': token.key,
+                    'user_id': user.pk,
+                    'email': user.email
+                })
+            else:
+                return Response({"error":"Invalid Credentials"},status=status.HTTP_400_BAD_REQUEST)
+
+       
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })

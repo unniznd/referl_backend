@@ -26,7 +26,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'referldb',
+        'NAME': 'unnikuznd$referldb',
         'USER': 'unnikuznd',
         'PASSWORD': os.getenv("PASSWORD"),
         'HOST':'unnikuznd.mysql.pythonanywhere-services.com',

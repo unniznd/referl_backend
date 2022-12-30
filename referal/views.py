@@ -209,16 +209,25 @@ class ShopOwnerReferal(ListAPIView):
                 current_status=1,
                 referal_code=request.data.get('referal_code'),
             ).first()
+            shop_owner = ShopOwner.objects.filter(profile=request.user,).first()
+
             if connection:
-                referal = ReferalEarning.objects.create(
-                    referal = connection,
-                    platform=request.data.get('platform'),
-                    phone_number=request.data.get('phone_number'),
-                    bill_amount=request.data.get('bill_amount'),
-                    payout=connection.payout,
-                )
-                referal.save()
-                return Response({"id":referal.id})
+                if shop_owner.balance - connection.payout>=0:
+                    shop_owner.balance = shop_owner.balance - connection.payout
+                    referal = ReferalEarning.objects.create(
+                        referal = connection,
+                        platform=request.data.get('platform'),
+                        phone_number=request.data.get('phone_number'),
+                        bill_amount=request.data.get('bill_amount'),
+                        payout=connection.payout,
+                    )
+                    referal.save()
+                    shop_owner.save()
+                    return Response({"id":referal.id})
+                else:
+                    return Response({"res":"Insufficient Balance"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+                
             else:
                 return Response({"res":"Referal Expired or Invalid"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
