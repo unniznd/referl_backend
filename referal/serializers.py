@@ -26,6 +26,7 @@ class ReferalSerializer(serializers.ModelSerializer):
     shop_name = serializers.CharField(source="shop_owner.profile.name")
     no_of_referal = serializers.SerializerMethodField()
     earned_money = serializers.SerializerMethodField()
+    referal_code = serializers.SerializerMethodField()
 
     def get_no_of_referal(self,obj):
         referal_earning = ReferalEarning.objects.filter(referal__referal_code=obj.referal_code)
@@ -45,7 +46,10 @@ class ReferalSerializer(serializers.ModelSerializer):
         
         return 0
 
-
+    def get_referal_code(self, obj):
+        if obj.referal_code == "0":
+            return "Not Generated"
+        return obj.referal_code
     class Meta:
         model = Connection
         fields = ('shop_name', 'referal_code','no_of_referal','earned_money')
