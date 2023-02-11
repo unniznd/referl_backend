@@ -1,9 +1,10 @@
 from rest_framework import serializers
-
 from users.models import( 
     ShopOwner as ShopOwnerModel, 
     Influencer as InfluencerModel
 )
+
+from datetime import date, timedelta
 
 import ast
 
@@ -40,7 +41,12 @@ class ShopOwnerPublicSerailizer(serializers.ModelSerializer):
     username = serializers.CharField(source="profile.username")
     name = serializers.CharField(source="profile.name")
     email = serializers.EmailField(source="profile.email")
+    validity = serializers.SerializerMethodField()
 
     class Meta:
         model = ShopOwnerModel
         fields = ('id','username','name','email','payout','validity')
+    
+    def get_validity(self, obj):
+        print(obj.validity)
+        return date.today() + timedelta(days=obj.validity)
