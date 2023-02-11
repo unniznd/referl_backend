@@ -48,5 +48,4 @@ class ShopOwnerPublicSerailizer(serializers.ModelSerializer):
         fields = ('id','username','name','email','payout','validity')
     
     def get_validity(self, obj):
-        print(obj.validity)
         return (date.today() + timedelta(days=obj.validity)).strftime("%d-%b-%Y")

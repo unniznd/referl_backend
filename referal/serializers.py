@@ -47,8 +47,12 @@ class ReferalSerializer(serializers.ModelSerializer):
         return 0
 
     def get_referal_code(self, obj):
-        if obj.referal_code == "0":
+        
+        if obj.current_status == 0:
             return "Not Generated"
+        elif obj.current_status == 2:
+            return "Expired"
+        
         return obj.referal_code
     class Meta:
         model = Connection
