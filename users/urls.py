@@ -7,5 +7,6 @@ urlpatterns = [
    path('shopowner/profile/',ShopOwnerView.as_view(), name="shop-owner-profile"),
    path('influencer/profile/',InfluencerView.as_view(), name="influencer-profile"),
    path('shopowner/public/profile/',ShopOwnerPublicView.as_view(), name="shopowner-public-profile"),
-   path('token/auth/', CustomAuthToken.as_view())
+   path('account/login/', CustomAuthToken.as_view())
 ]
+ 

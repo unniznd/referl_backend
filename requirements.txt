@@ -10,3 +10,4 @@ djongo
 django-cloudinary-storage
 whitenoise
 python-dotenv
+cryptography

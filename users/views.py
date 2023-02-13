@@ -9,6 +9,14 @@ from users.models import ShopOwner, Influencer
 from users.pagination import ShopOwnerPagination
 from users.serializers import InfluencerSerializer, ShopOwnerSerializer, ShopOwnerPublicSerailizer
 
+from cryptography.fernet import Fernet
+
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
+fernet = Fernet(os.getenv('FERNET_KEY'))
 
 class ShopOwnerView(ListAPIView):
     queryset = ShopOwner.objects.all()
@@ -75,34 +83,15 @@ class ShopOwnerPublicView(ListAPIView):
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
+        request._mutable = True
+        request.data['password'] = fernet.decrypt(request.data['password']).decode()
+        request._mutable = False
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        if request.data["is_shopowner"] == True:
-            shopowner = ShopOwner.objects.filter(profile=user).first()
-            if shopowner:
-                return Response({
-                    'token': token.key,
-                    'user_id': user.pk,
-                    'email': user.email
-                })
-            else:
-                return Response({"error":"Invalid Credentials"},status=status.HTTP_400_BAD_REQUEST)
-        
-        elif request.data["is_shopowner"] == False:
-            influencer = Influencer.objects.filter(profile=user).first()
-            if influencer:
-                return Response({
-                    'token': token.key,
-                    'user_id': user.pk,
-                    'email': user.email
-                })
-            else:
-                return Response({"error":"Invalid Credentials"},status=status.HTTP_400_BAD_REQUEST)
 
-       
         return Response({
             'token': token.key,
             'user_id': user.pk,
