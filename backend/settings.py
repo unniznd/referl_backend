@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     
 
     'users',
-    'referal'
+    'referal',
+    'payment'
 ]
 
 REST_FRAMEWORK = {
