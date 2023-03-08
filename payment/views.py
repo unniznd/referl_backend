@@ -53,6 +53,7 @@ class CallBack(ListAPIView):
         return client.utility.verify_payment_signature(response_data)
 
     def post(self, request, *args, **kwargs):
+        
         if "razorpay_signature" in request.data:
             payment_id = request.data.get("razorpay_payment_id", "")
             provider_order_id = request.data.get("razorpay_order_id", "")
@@ -74,10 +75,13 @@ class CallBack(ListAPIView):
             if isVerified:
                 order.status = PaymentStatus.SUCCESS
                 order.save()
+                user = ShopOwner.objects.filter(profile=request.user)
                 return Response({"status": order.status, "transaction_id":order.id})
             else:
                 order.status = PaymentStatus.FAILURE
                 order.save()
+                user = ShopOwner.objects.filter(profile=request.user)
+                user.balance = user.balance + order.amount
                 return Response({"status": order.status, "transaction_id":order.id})
         else:
             payment_id = request.data.get("razorpay_payment_id")
