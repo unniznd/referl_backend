@@ -75,13 +75,17 @@ class CallBack(ListAPIView):
             if isVerified:
                 order.status = PaymentStatus.SUCCESS
                 order.save()
-                user = ShopOwner.objects.filter(profile=request.user)
+                user = ShopOwner.objects.filter(profile=request.user).first()
+                print(user.balance)
+                print(order.amount)
+                user.balance = user.balance + order.amount
+                
+                user.save()
                 return Response({"status": order.status, "transaction_id":order.id})
             else:
                 order.status = PaymentStatus.FAILURE
                 order.save()
-                user = ShopOwner.objects.filter(profile=request.user)
-                user.balance = user.balance + order.amount
+                
                 return Response({"status": order.status, "transaction_id":order.id})
         else:
             payment_id = request.data.get("razorpay_payment_id")

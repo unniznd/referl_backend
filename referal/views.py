@@ -203,6 +203,7 @@ class ShopOwnerReferal(ListAPIView):
 
     def post(self, request, *args, **kwargs):
         mark_expired(Connection.objects.all())
+        print(request.data.get('platform'))
         try:
             connection = Connection.objects.filter(
                 shop_owner__profile=request.user,
@@ -237,6 +238,6 @@ class ShopOwnerReferal(ListAPIView):
             return Response({"res":"Referal Already Redeemed"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
         
-        except:
-            return Response({"res":"Unexcepted Error"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+        # except:
+        #     return Response({"res":"Unexcepted Error"},
+        #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
