@@ -3,7 +3,7 @@ from django.urls import path
 from referal.views import (
     ActiveReferalView, ExpiredReferalView, InfluencerRequestView, PendingReferalView, 
     InfluencerReferalSummaryView, MonthlyReferalView, ActiveInfluencerView,
-    ShopOwnerTotalReferalView, ShopOwnerReferal
+    ShopOwnerTotalReferalView, ShopOwnerReferal, RequestReferal
 )
 
 urlpatterns = [
@@ -18,5 +18,6 @@ urlpatterns = [
     path('influencer/referal/active/', ActiveReferalView.as_view(), name="influencer-active-request"),
     path('influencer/referal/expired/', ExpiredReferalView.as_view(), name="influencer-expired-request"),
     path('influencer/referal/summary/',InfluencerReferalSummaryView.as_view(), name="influencer-summary"),
+    path('influencer/referal/request/', RequestReferal.as_view(), name="influencer-request-referal")
     
 ]

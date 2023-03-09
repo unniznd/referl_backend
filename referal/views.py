@@ -9,7 +9,7 @@ from referal.models import Connection, ReferalEarning, PLATFORM
 from referal.serializers import InfluencerRequestSerializer, ReferalSerializer, ActiveInfluencerSerializer
 from referal.util import mark_expired, get_referalcode
 
-from users.models import ShopOwner, Influencer
+from users.models import ShopOwner, Influencer, User
 
 from datetime import datetime
 
@@ -238,6 +238,37 @@ class ShopOwnerReferal(ListAPIView):
             return Response({"res":"Referal Already Redeemed"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
         
-        # except:
-        #     return Response({"res":"Unexcepted Error"},
-        #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+        except:
+            return Response({"res":"Unexcepted Error"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+    
+class RequestReferal(ListAPIView):
+
+    def post(self, request, *args, **kwagrs):
+        try:
+            user = User.objects.filter(id=request.data.get('id')).first()
+            print(user)
+            influencer = Influencer.objects.filter(
+                profile=request.user,
+            ).first()
+            shop_owner = ShopOwner.objects.filter(
+                profile=user
+            ).first()
+            if influencer and shop_owner:
+                connection = Connection.objects.create(
+                    influencer=influencer,
+                    shop_owner=shop_owner,
+                    current_status=0,
+                )
+                connection.save()
+                return Response({"res":"OK"})
+            else:
+                return Response({"res":"Invalid Phone Number"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+        except IntegrityError:
+            return Response({"res":"Already Requested"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)
+        
+        except:
+            return Response({"res":"Unexcepted Error"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,)

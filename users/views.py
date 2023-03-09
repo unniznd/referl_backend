@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-
+from rest_framework import filters
 from users.models import ShopOwner, Influencer
 from users.pagination import ShopOwnerPagination
 from users.serializers import InfluencerSerializer, ShopOwnerSerializer, ShopOwnerPublicSerailizer
@@ -69,12 +69,15 @@ class InfluencerView(ListAPIView):
         pass
 
 class ShopOwnerPublicView(ListAPIView):
-    queryset = ShopOwner.objects.all()
+    
     serializer_class = ShopOwnerSerializer
     pagination_class = ShopOwnerPagination
+    search_fields = ['name','username']
+    filter_backends = [ filters.SearchFilter, ]
     
     def get(self, request, *args, **kwargs):
-        shop_owners = self.paginate_queryset(queryset=ShopOwner.objects.all())
+        query_set = self.filter_queryset(ShopOwner.objects.get_queryset())
+        shop_owners = self.paginate_queryset(queryset=query_set)
         shop_owners_serial = ShopOwnerPublicSerailizer(shop_owners,many=True)
         return self.get_paginated_response(shop_owners_serial.data)
 
