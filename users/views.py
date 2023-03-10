@@ -74,11 +74,17 @@ class ShopOwnerPublicView(ListAPIView):
     pagination_class = ShopOwnerPagination
     search_fields = ['name','username']
     filter_backends = [ filters.SearchFilter, ]
+    permission_classes = [permissions.IsAuthenticated,]
     
     def get(self, request, *args, **kwargs):
         query_set = self.filter_queryset(ShopOwner.objects.get_queryset())
         shop_owners = self.paginate_queryset(queryset=query_set)
-        shop_owners_serial = ShopOwnerPublicSerailizer(shop_owners,many=True)
+        shop_owners_serial = ShopOwnerPublicSerailizer(
+            shop_owners, many=True, 
+            context = {
+            'request':request
+            }
+        )
         return self.get_paginated_response(shop_owners_serial.data)
 
 

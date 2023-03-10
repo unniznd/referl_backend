@@ -4,6 +4,8 @@ from users.models import(
     Influencer as InfluencerModel
 )
 
+from referal.models import Connection
+
 from datetime import date, timedelta
 
 import ast
@@ -18,7 +20,7 @@ class ShopOwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShopOwnerModel
         fields = ('id','username','name','email',
-                 'auth_provider','balance','payout','validity')
+                 'auth_provider','balance','payout','validity', 'profile_pic')
 
 class InfluencerSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source="profile.id")
@@ -43,9 +45,19 @@ class ShopOwnerPublicSerailizer(serializers.ModelSerializer):
     email = serializers.EmailField(source="profile.email")
     validity = serializers.SerializerMethodField()
 
+    has_pending = serializers.SerializerMethodField()
+
     class Meta:
         model = ShopOwnerModel
-        fields = ('id','username','name','email','payout','validity')
+        fields = ('id','username','name','email','payout','validity', 'has_pending', 'profile_pic')
     
     def get_validity(self, obj):
         return (date.today() + timedelta(days=obj.validity)).strftime("%d-%b-%Y")
+    
+    def get_has_pending(self, obj):
+        request = self.context.get('request', None)
+        influencer = InfluencerModel.objects.filter(profile=request.user).first()
+        conncetion = Connection.objects.filter(shop_owner=obj,influencer=influencer, current_status=0)
+        if conncetion:
+            return True
+        return False

@@ -7,7 +7,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(ShopOwner)
 class ShopOwnerAdmin(admin.ModelAdmin):
-    list_display = ['profile_name','balance','payout','validity']
+    list_display = ['profile_name','balance','payout','validity', 'profile_pic']
 
     def profile_name(self,obj):
         return obj.profile.name
