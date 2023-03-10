@@ -38,5 +38,6 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': "dhw9oa5fm",
     'API_KEY': os.getenv("API_KEY"),
     'API_SECRET': os.getenv("API_SECRET"),
+    'API_PROXY': 'http://proxy.server:3128'
 }
 
