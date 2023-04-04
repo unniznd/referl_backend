@@ -33,7 +33,7 @@ class Connection(models.Model):
         return self.shop_owner.profile.name + " " + self.influencer.profile.name
     
     class Meta:
-        unique_together = ('shop_owner','influencer','created_at')
+        unique_together = ('shop_owner','influencer','current_status')
 
 class ReferalEarning(models.Model):
     referal = models.ForeignKey(Connection, on_delete=models.CASCADE)
