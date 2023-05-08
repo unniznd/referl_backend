@@ -72,7 +72,7 @@ class ShopOwnerPublicView(ListAPIView):
     
     serializer_class = ShopOwnerSerializer
     pagination_class = ShopOwnerPagination
-    search_fields = ['name','username']
+    search_fields = ['profile__name', 'profile__username']
     filter_backends = [ filters.SearchFilter, ]
     permission_classes = [permissions.IsAuthenticated,]
     
