@@ -4,13 +4,18 @@ from rest_framework import permissions
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework import filters
-from users.models import ShopOwner, Influencer
+from users.models import ShopOwner, Influencer, Shops
 from users.pagination import ShopOwnerPagination
-from users.serializers import InfluencerSerializer, ShopOwnerSerializer, ShopOwnerPublicSerailizer
+from users.serializers import (
+    InfluencerSerializer, ShopOwnerSerializer, 
+    ShopSerializer, PinnedShopsSerializer
+
+)
 
 from cryptography.fernet import Fernet
 
 import os
+import ast
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -70,16 +75,16 @@ class InfluencerView(ListAPIView):
 
 class ShopOwnerPublicView(ListAPIView):
     
-    serializer_class = ShopOwnerSerializer
+    serializer_class = ShopSerializer
     pagination_class = ShopOwnerPagination
     search_fields = ['profile__name', 'profile__username']
     filter_backends = [ filters.SearchFilter, ]
     permission_classes = [permissions.IsAuthenticated,]
     
     def get(self, request, *args, **kwargs):
-        query_set = self.filter_queryset(ShopOwner.objects.get_queryset())
+        query_set = self.filter_queryset(Shops.objects.get_queryset())
         shop_owners = self.paginate_queryset(queryset=query_set)
-        shop_owners_serial = ShopOwnerPublicSerailizer(
+        shop_owners_serial = ShopSerializer(
             shop_owners, many=True, 
             context = {
             'request':request
@@ -105,4 +110,40 @@ class CustomAuthToken(ObtainAuthToken):
             'token': token.key,
             'user_id': user.pk,
             'email': user.email
+        })
+
+class PinShopsInfluencer(ListAPIView):
+    queryset = Influencer.objects.all()
+    serializer_class = InfluencerSerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        influencer = Influencer.objects.filter(profile=request.user).first()
+        pinned_shops = PinnedShopsSerializer(influencer, context={'request': request})
+        return Response(pinned_shops.data)
+
+
+        
+    
+    def post(self, request, id, *args, **kwargs):
+        influencer = Influencer.objects.filter(profile=request.user).first()
+        if influencer:
+            if influencer.pinned_shops:
+                pinned_shops = ast.literal_eval(influencer.pinned_shops)
+            else:
+                pinned_shops = []
+
+            if id not in pinned_shops:
+                pinned_shops.append(id)
+                influencer.pinned_shops = str(pinned_shops)
+                influencer.save()
+                return Response({"status":True})
+            return Response({"status":False,"error":"Shop already pinned!"})
+
+        
+        return Response({
+            "status":False,
+            "error":'No such profile found!'
         })

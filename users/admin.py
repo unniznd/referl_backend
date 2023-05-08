@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, ShopOwner, Influencer
+from .models import User, ShopOwner, Influencer, Shops
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -14,7 +14,15 @@ class ShopOwnerAdmin(admin.ModelAdmin):
 
 @admin.register(Influencer)
 class InfluencersAdmin(admin.ModelAdmin):
-    list_display = ['profile_name','balance','social','profile_pic']
+    list_display = ['profile_name','balance','social','profile_pic', 'pinned_shops']
 
     def profile_name(self,obj):
         return obj.profile.name
+
+@admin.register(Shops)
+class ShopsAdmin(admin.ModelAdmin):
+    list_display = ['shop_owner','name','address','created_at','updated_at']
+
+    def shop_owner(self,obj):
+        return obj.shop_owner.profile.name
+
