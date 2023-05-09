@@ -147,3 +147,24 @@ class PinShopsInfluencer(ListAPIView):
             "status":False,
             "error":'No such profile found!'
         })
+
+    def delete(self, request, id, *args, **kwargs):
+        # unpin shop from the influencer
+        influencer = Influencer.objects.filter(profile=request.user).first()
+        if influencer:
+            if influencer.pinned_shops:
+                pinned_shops = ast.literal_eval(influencer.pinned_shops)
+            else:
+                pinned_shops = []
+            
+            if id in pinned_shops:
+                pinned_shops.remove(id)
+                influencer.pinned_shops = str(pinned_shops)
+                influencer.save()
+                return Response({"status":True})
+            return Response({"status":False,"error":"Shop not pinned!"})
+        
+        return Response({
+            "status":False,
+            "error":'No such profile found!'
+        })
