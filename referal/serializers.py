@@ -40,7 +40,7 @@ class ReferalSerializer(serializers.ModelSerializer):
         if referal_earning:
             money = 0
             for referal in referal_earning:
-                money = money + referal.bill_amount
+                money = money + referal.payout
             
             return money
         
