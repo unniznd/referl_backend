@@ -141,6 +141,7 @@ class ActiveInfluencerView(ListAPIView):
             shop_owner__profile=request.user,
             current_status=1,
         )
+
         connection_active_serial = ActiveInfluencerSerializer(connection_active, many=True)
         return Response({
             "count":len(connection_active),
@@ -203,7 +204,6 @@ class ShopOwnerReferal(ListAPIView):
 
     def post(self, request, *args, **kwargs):
         mark_expired(Connection.objects.all())
-        print(request.data.get('platform'))
         try:
             connection = Connection.objects.filter(
                 shop_owner__profile=request.user,
@@ -211,10 +211,10 @@ class ShopOwnerReferal(ListAPIView):
                 referal_code=request.data.get('referal_code'),
             ).first()
             shop_owner = ShopOwner.objects.filter(profile=request.user,).first()
+            influencer = Influencer.objects.filter(profile=connection.influencer.profile,).first()
 
             if connection:
                 if shop_owner.balance - connection.payout>=0:
-                    shop_owner.balance = shop_owner.balance - connection.payout
                     referal = ReferalEarning.objects.create(
                         referal = connection,
                         platform=request.data.get('platform'),
@@ -223,6 +223,9 @@ class ShopOwnerReferal(ListAPIView):
                         payout=connection.payout,
                     )
                     referal.save()
+                    shop_owner.balance = shop_owner.balance - connection.payout
+                    influencer.balance = influencer.balance + connection.payout
+                    influencer.save()
                     shop_owner.save()
                     return Response({"id":referal.id})
                 else:

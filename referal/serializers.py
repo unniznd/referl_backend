@@ -77,7 +77,7 @@ class ActiveInfluencerSerializer(serializers.ModelSerializer):
         earned = 0
         if referals:
             for referal in referals:
-                earned = earned + referal.bill_amount
+                earned = earned + referal.payout
         return earned
 
     class Meta:
