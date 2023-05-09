@@ -74,12 +74,13 @@ class ShopSerializer(serializers.ModelSerializer):
     payout = serializers.IntegerField(source="shop_owner.payout")
     validity = serializers.SerializerMethodField()
     has_pending = serializers.SerializerMethodField()
+    is_pinned = serializers.SerializerMethodField()
 
 
     class Meta:
         model = ShopModel
         fields = ('id','owner_name','owner_email','name','address',
-                 'validity', 'has_pending', 'payout', 'shop_pic')
+                 'validity', 'has_pending', 'payout', 'shop_pic', 'is_pinned')
 
     def get_validity(self, obj):
         return (date.today() + timedelta(days=obj.shop_owner.validity)).strftime("%d-%b-%Y")
@@ -94,6 +95,15 @@ class ShopSerializer(serializers.ModelSerializer):
         ).first()
         if conncetion:
             return True
+        return False
+    
+    def get_is_pinned(self, obj):
+        request = self.context.get('request', None)
+        influencer = InfluencerModel.objects.filter(profile=request.user).first()
+        print(1 in ast.literal_eval(influencer.pinned_shops))
+        if influencer:
+            if obj.shop_owner.profile.id in ast.literal_eval(influencer.pinned_shops):
+                return True
         return False
     
 class PinnedShopsSerializer(serializers.ModelSerializer):
