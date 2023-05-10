@@ -48,6 +48,7 @@ class Influencer(models.Model):
     profile = models.OneToOneField(User,on_delete=models.CASCADE)
     balance = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     social = models.CharField(max_length=2048,)
+    phone_number = models.CharField(max_length=10, null=True, blank=True)
     pinned_shops = models.CharField(max_length=1024, null=True, default='[]')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -34,7 +34,7 @@ class InfluencerSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfluencerModel
         fields = ('id','username','name','email',
-                 'auth_provider','balance','social')
+                 'auth_provider','balance','social', 'phone_number', 'profile_pic')
 
     def get_social(self, obj):
         return ast.literal_eval(obj.social)
