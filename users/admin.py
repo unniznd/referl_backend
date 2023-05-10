@@ -14,7 +14,7 @@ class ShopOwnerAdmin(admin.ModelAdmin):
 
 @admin.register(Influencer)
 class InfluencersAdmin(admin.ModelAdmin):
-    list_display = ['profile_name','balance','social','profile_pic', 'pinned_shops']
+    list_display = ['profile_name','balance','social','profile_pic', 'pinned_shops', 'phone_number']
 
     def profile_name(self,obj):
         return obj.profile.name
